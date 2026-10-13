@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { ironPerClick, type GameEvent } from '@akai/shared';
-import { buildCeiling, buildGround, GROUND_CROP_H } from './ground.js';
+import { buildCeiling, buildGround } from './ground.js';
+import { renderProps } from './props.js';
+import { cssColor, defaultLayout, loadLayout, type ZoneLayout } from './sceneLayout.js';
 import type { Zone } from './zones.js';
 
 /**
@@ -20,39 +22,44 @@ export class MiningView {
 
   constructor(private readonly scene: Phaser.Scene, private readonly zone: Zone) {
     const { x, y, w, h } = zone;
+    // cenário vem do layout editável (Tile Editor); sem layout salvo, o
+    // default reproduz exatamente a composição procedural anterior
+    const lz: ZoneLayout = loadLayout()?.mine ?? defaultLayout().mine;
     // fundo de caverna em dois tons (sem disputar atenção com o combate)
-    const top = scene.add.rectangle(x + w / 2, y + h * 0.35, w, h * 0.7, 0x140e08);
-    const bottom = scene.add.rectangle(x + w / 2, y + h * 0.85, w, h * 0.3, 0x1d1409);
+    const top = scene.add.rectangle(x + w / 2, y + h * 0.35, w, h * 0.7, cssColor(lz.sky, 0x140e08));
     top.setDepth(-5);
-    bottom.setDepth(-5);
+    if (lz.sky2) {
+      const bottom = scene.add.rectangle(x + w / 2, y + h * 0.85, w, h * 0.3, cssColor(lz.sky2, 0x1d1409));
+      bottom.setDepth(-5);
+    }
 
     // separador físico entre combate e mina: vigas + teto de caverna
     const sep = scene.add.rectangle(x + w / 2, y + 2, w, 4, 0x000000, 0.85);
     sep.setDepth(5);
-    buildCeiling(scene, x, y + 4, w, 6, 26).setDepth(1);
+    if (lz.ceiling) {
+      buildCeiling(scene, x, y + 4, w, { frame: 6, cells: lz.ceiling.cells, cropH: lz.ceiling.cropH }).setDepth(1);
+    }
 
     // escoras de madeira laterais
-    for (const px of [x + 10, x + w - 10]) {
-      const post = scene.add.rectangle(px, y + h / 2, 7, h - 24, 0x4a3520);
-      post.setDepth(1);
+    if (lz.posts) {
+      for (const px of [x + 10, x + w - 10]) {
+        const post = scene.add.rectangle(px, y + h / 2, 7, h - 24, 0x4a3520);
+        post.setDepth(1);
+      }
     }
 
-    // trilha própria da mina (variante laranja do tileset)
-    this.groundTop = y + h - GROUND_CROP_H + 6;
-    buildGround(scene, x, y + h + 6, w, 6, GROUND_CROP_H, 0x2a1c10).container.setDepth(1);
+    // trilha própria da mina (variante laranja do tileset, editável por coluna)
+    const zoneBottom = y + h + 6;
+    this.groundTop = zoneBottom - lz.ground.cropH;
+    buildGround(scene, x, zoneBottom, w, {
+      frame: 6,
+      cells: lz.ground.cells,
+      cropH: lz.ground.cropH,
+      dirtColor: cssColor(lz.ground.fill, 0x2a1c10),
+    }).container.setDepth(1);
 
-    // veios decorativos (identidade das minas futuras)
-    const veins: Array<[string, number, number]> = [
-      ['node_coal', 0.18, 2.2],
-      ['node_gold', 0.82, 2.2],
-      ['node_jade', 0.93, 1.8],
-    ];
-    for (const [key, fx, scale] of veins) {
-      const vein = scene.add.image(x + w * fx, this.groundTop + 6, key);
-      vein.setScale(scale);
-      vein.setAlpha(0.85);
-      vein.setDepth(2);
-    }
+    // props decorativos do layout (veios de minério etc., assets reais)
+    renderProps(scene, zone, this.groundTop, lz.props);
 
     // nó de ferro clicável, semi-enterrado na trilha
     this.node = scene.add.image(x + w / 2, this.groundTop + 2, 'node_iron');

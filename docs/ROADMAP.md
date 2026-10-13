@@ -50,6 +50,18 @@ Legenda: ✅ concluído com evidência · 🟡 parcial · ⬜ pendente · ⛔ bl
 - [x] Velocidade de combate 1x/2x (intent `setSpeed`, testes de paridade).
 - [x] Resumo de ganhos offline na UI (banner + `ackOffline`).
 
+## Fase 3.6 — Cenário auditado + ferramenta de arte ✅
+
+- [x] Correções visuais auditadas com mockups (orientações de sprites,
+  aproximação dos combatentes, tileset 96×96 sem frestas, fundo composto com
+  parallax, cena própria da mina) — 2026-10-13.
+- [x] **Tile Editor de cenário** (`#/editor`, docs/tools/scene-editor.md):
+  edição manual de tiles (chão/teto por coluna), assets colocáveis
+  (nós/ícones/tiles soltos) e fundo (cores, camadas, parallax, ancoragem)
+  da arena e da mina, com persistência local, export/import JSON e aplicação
+  direta nas views de jogo (`game/sceneLayout.ts`).
+- [x] Testes do contrato de layout (`tests/client/scene-layout.spec.ts`).
+
 ## Fase 4 — Progressão RPG ⬜
 
 Equipamentos + raridades + drops · mascotes (⛔ lacuna de asset documentada) ·

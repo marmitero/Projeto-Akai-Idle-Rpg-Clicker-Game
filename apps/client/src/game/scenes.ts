@@ -7,38 +7,45 @@ import { MiningView } from './MiningView.js';
 
 export const loadErrors: string[] = [];
 
+/** Carrega todos os assets curados do manifesto (jogo e Tile Editor). */
+export const preloadAssets = (scene: Phaser.Scene): void => {
+    for (const sheet of SHEETS) {
+      scene.load.spritesheet(sheet.key, `/${sheet.path}`, {
+        frameWidth: sheet.frameWidth,
+        frameHeight: sheet.frameHeight,
+      });
+    }
+    for (const image of IMAGES) {
+      scene.load.image(image.key, `/${image.path}`);
+    }
+    for (const seq of SEQUENCES) {
+      for (const keys of Object.values(seq.anims)) {
+        for (const key of keys) scene.load.image(key, `/${key}`);
+      }
+    }
+    for (const comp of COMPOSITIONS) {
+      for (const part of comp.parts) {
+        scene.load.spritesheet(`${comp.key}__${part.part}`, `/${part.path}`, { frameWidth: 80, frameHeight: 64 });
+      }
+    }
+    scene.load.on('loaderror', (file: { src?: string }) => {
+      loadErrors.push(String(file.src ?? 'asset desconhecido'));
+    });
+    const progressEl = document.getElementById('load-progress');
+    if (progressEl) {
+      scene.load.on('progress', (p: number) => {
+        progressEl.style.width = `${Math.round(p * 100)}%`;
+      });
+    }
+};
+
 export class BootScene extends Phaser.Scene {
   constructor() {
     super('boot');
   }
 
   preload(): void {
-    for (const sheet of SHEETS) {
-      this.load.spritesheet(sheet.key, `/${sheet.path}`, {
-        frameWidth: sheet.frameWidth,
-        frameHeight: sheet.frameHeight,
-      });
-    }
-    for (const image of IMAGES) {
-      this.load.image(image.key, `/${image.path}`);
-    }
-    for (const seq of SEQUENCES) {
-      for (const keys of Object.values(seq.anims)) {
-        for (const key of keys) this.load.image(key, `/${key}`);
-      }
-    }
-    for (const comp of COMPOSITIONS) {
-      for (const part of comp.parts) {
-        this.load.spritesheet(`${comp.key}__${part.part}`, `/${part.path}`, { frameWidth: 80, frameHeight: 64 });
-      }
-    }
-    this.load.on('loaderror', (file: { src?: string }) => {
-      loadErrors.push(String(file.src ?? 'asset desconhecido'));
-    });
-    this.load.on('progress', (p: number) => {
-      const el = document.getElementById('load-progress');
-      if (el) el.style.width = `${Math.round(p * 100)}%`;
-    });
+    preloadAssets(this);
   }
 
   create(): void {

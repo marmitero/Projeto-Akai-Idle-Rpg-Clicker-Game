@@ -71,6 +71,16 @@ offline). Fase 4 não iniciada. Fases 0-3 concluídas na primeira execução.
   combate, escala só o tick de batalha — minas em tempo real, testado) e
   resumo de produção offline em banner com `ackOffline` idempotente por
   relatório; migração defensiva de saves locais anteriores.
+- **Tile Editor de cenário** (`#/editor`, botão "Cenário" no jogo;
+  docs/tools/scene-editor.md): edição manual de tiles por coluna (chão/teto,
+  18 frames reais do tileset 96x96), assets colocáveis (nós de minério,
+  ícones, tiles soltos) com arraste/escala/espelho/profundidade/opacidade, e
+  fundo da arena (cores, visibilidade/parallax/ancoragem das 5 camadas) e da
+  caverna (tons, escoras, teto). Layout versionado em localStorage com
+  export/import JSON validado; `CombatView`/`MiningView` consomem o mesmo
+  layout (`game/sceneLayout.ts`), e a EditorScene renderiza com as mesmas
+  receitas das views (o visto = o jogado). Sem layout salvo, o default
+  reproduz exatamente o cenário procedural anterior.
 
 ## 7. Funcionalidades parciais / pendentes
 
@@ -119,7 +129,8 @@ offline). Fase 4 não iniciada. Fases 0-3 concluídas na primeira execução.
 
 ## 10. Últimos testes
 
-`npx vitest run` → 9 arquivos, 49 testes, 0 falhas (2026-10-13 16:03).
+`npx vitest run` → 10 arquivos, 57 testes, 0 falhas (2026-10-13 16:42; +8 do
+contrato de layout do Tile Editor).
 `tsc -b packages/shared apps/server apps/client` → 0 erros.
 `vite build` → ok. Smoke HTTP ponta a ponta → ok (sessão/clique/state/sprites).
 
@@ -140,7 +151,9 @@ persistido, equipável, com atributos aplicados ao combate.
 - Contratos: `packages/shared/src/contracts/*`
 - Server: `apps/server/src/{app,sessions,index}.ts`, `persistence/FileStore.ts`
 - Client: `apps/client/src/{main.ts,ui/shell.ts,game/*,net/*,assets/manifest.ts}`
-- Testes: `tests/shared/*`, `tests/server/*`, `tests/assets/*`
+- Tile Editor: `apps/client/src/editor/{main,panel,EditorScene,palette}.ts`,
+  `apps/client/src/game/{sceneLayout,props}.ts`, `docs/tools/scene-editor.md`
+- Testes: `tests/shared/*`, `tests/server/*`, `tests/assets/*`, `tests/client/*`
 - Auditoria: `tools/scan_sprites.py`, `tools/build_manifest.py`, `tools/out/*`
 
 ## 13. Alterações recentes (esta execução)
@@ -149,7 +162,12 @@ Primeira execução: criação de toda a base de código, docs e testes das seç
 3 e 6 (commit `14343d2`). Segunda execução: Fase 3.5 (setSpeed/ackOffline, botões de UI, migração de
 saves). Terceira execução: correções visuais 1-5 da seção 8 (orientações,
 aproximação, tiles 96x96, fundo+parallax, cena da mina), novas views
-game/ground.ts e game/zones.ts, mockups de validação em tools/out/previews/. Nenhum arquivo
+game/ground.ts e game/zones.ts, mockups de validação em tools/out/previews/.
+Quarta execução: Tile Editor de cenário (Fase 3.6 do ROADMAP): rota `#/editor`
+com cena Phaser própria + painel DOM, contrato de layout persistido
+(game/sceneLayout.ts), props decorativos (game/props.ts), ground.ts com
+células por coluna (buracos inclusos), CombatView/MiningView consumindo o
+layout, 8 testes novos e docs/tools/scene-editor.md. Nenhum arquivo
 pré-existente foi removido, renomeado ou sobrescrito (`docs/master-prompt.md`
 e `sprites/` intactos).
 

@@ -6,6 +6,14 @@ import { LocalDriver } from './net/LocalDriver.js';
 import { OnlineDriver } from './net/OnlineDriver.js';
 import type { Driver, DriverHandlers, UiIntent } from './net/driver.js';
 
+// Rota do Tile Editor: `#/editor` abre o editor de cenário em vez do jogo.
+if (window.location.hash.startsWith('#/editor')) {
+  void import('./editor/main.js').then((m) => m.bootEditor());
+} else {
+  bootGame();
+}
+
+function bootGame(): void {
 const stage = document.getElementById('stage')!;
 
 const game = new Phaser.Game({
@@ -101,3 +109,18 @@ void switchMode('online');
 window.addEventListener('resize', () => {
   void stage;
 });
+
+// atalho discreto para o Tile Editor (ferramenta de arte/dev)
+const editorBtn = document.createElement('button');
+editorBtn.textContent = 'Cenário';
+editorBtn.title = 'Abrir o Tile Editor (editar tiles, assets e fundo)';
+editorBtn.style.cssText =
+  'position:absolute;right:8px;bottom:8px;z-index:25;pointer-events:auto;' +
+  'background:rgba(10,10,18,.72);border:1px solid #3a3a55;border-radius:6px;' +
+  'color:#9a97b0;font-size:11px;padding:4px 8px;cursor:pointer';
+editorBtn.addEventListener('click', () => {
+  window.location.hash = '#/editor';
+  window.location.reload();
+});
+stage.appendChild(editorBtn);
+}

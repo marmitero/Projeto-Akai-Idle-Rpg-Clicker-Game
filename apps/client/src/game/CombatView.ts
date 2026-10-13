@@ -2,7 +2,16 @@ import Phaser from 'phaser';
 import { BALANCE, isBossFloor, type GameEvent, type PlayerState } from '@akai/shared';
 import { Actor, type ActorSource, type MultiSheetSpec } from './actors.js';
 import { COMPOSITIONS, SEQUENCES } from '../assets/manifest.js';
-import { buildGround, GROUND_CROP_H } from './ground.js';
+import { buildGround } from './ground.js';
+import { renderProps } from './props.js';
+import {
+  cssColor,
+  defaultLayout,
+  loadLayout,
+  VEG_ANCHOR_Y,
+  type BgLayerLayout,
+  type ZoneLayout,
+} from './sceneLayout.js';
 import type { Zone } from './zones.js';
 
 export const HERO_SOURCE: ActorSource = {
@@ -56,15 +65,6 @@ const PARALLAX_MARGIN = 96;
  * linha de vegetação (y~175 do canvas 1024x346) logo acima do chão de batalha,
  * senão o cenário "flutua" e sobra uma faixa vazia no meio da zona.
  */
-const VEG_ANCHOR_Y = 175;
-const BG_LAYERS: ReadonlyArray<{ key: string; factor: number; veg: boolean; dy: number }> = [
-  { key: 'bg_l1', factor: 0.1, veg: false, dy: 0 },
-  { key: 'bg_castle', factor: 0.2, veg: true, dy: -14 },
-  { key: 'bg_l2', factor: 0.32, veg: true, dy: 0 },
-  { key: 'bg_l3', factor: 0.5, veg: true, dy: 0 },
-  { key: 'bg_l4', factor: 0.72, veg: true, dy: 0 },
-];
-
 interface EnemyEntry {
   actor: Actor;
   defId: string;
@@ -103,38 +103,54 @@ export class CombatView {
       fontStyle: 'bold',
     });
     this.banner.setOrigin(0.5).setDepth(30).setAlpha(0);
-    this.groundTop = zone.y + zone.h - GROUND_CROP_H;
+    // cenário vem do layout editável (Tile Editor); sem layout salvo, o
+    // default reproduz exatamente a composição procedural anterior
+    this.layout = loadLayout()?.arena ?? defaultLayout().arena;
+    this.groundTop = zone.y + zone.h - this.layout.ground.cropH;
+    buildGround(scene, zone.x, zone.y + zone.h, zone.w, {
+      frame: 0,
+      cells: this.layout.ground.cells,
+      cropH: this.layout.ground.cropH,
+      dirtColor: cssColor(this.layout.ground.fill, 0x241a12),
+    }).container.setDepth(1);
     this.buildBackground();
+    renderProps(scene, zone, this.groundTop, this.layout.props);
     this.heroX = zone.x + zone.w * 0.3;
     this.lastFloor = -1;
   }
 
+  private layout: ZoneLayout;
+
   private buildBackground(): void {
     const { x, y, w, h } = this.zone;
-    const sky = this.scene.add.rectangle(x + w / 2, y + h / 2, w, h, 0x9fd0dc);
+    const sky = this.scene.add.rectangle(x + w / 2, y + h / 2, w, h, cssColor(this.layout.sky, 0x9fd0dc));
     sky.setDepth(-10);
     // todas as camadas compartilham origem e escala: é assim que o pack
     // compone o cenário (bandas em alturas diferentes do mesmo canvas)
     this.bgScale = (w + PARALLAX_MARGIN) / 1024;
-    for (const layer of BG_LAYERS) {
+    this.bgLayers = [];
+    for (const layer of this.layout.bg) {
+      if (!layer.visible || !this.scene.textures.exists(layer.key)) continue;
       const img = this.scene.add.image(0, 0, layer.key);
       img.setOrigin(0, 0);
       img.setScale(this.bgScale);
-      img.setDepth(-9 + BG_LAYERS.indexOf(layer));
+      img.setDepth(-9 + this.bgLayers.length);
       this.bgSprites.push(img);
+      this.bgLayers.push(layer);
     }
     this.bgTop = this.groundTop - 346 * this.bgScale;
   }
 
   private bgTop = 0;
   private bgScale = 1;
+  private bgLayers: BgLayerLayout[] = [];
 
   private applyParallax(offset: number): void {
     const { x } = this.zone;
     this.bgSprites.forEach((img, i) => {
-      const layer = BG_LAYERS[i];
+      const layer = this.bgLayers[i];
       if (!layer) return;
-      const y = layer.veg
+      const y = layer.anchor === 'veg'
         ? this.groundTop - VEG_ANCHOR_Y * this.bgScale + layer.dy
         : this.bgTop;
       img.setPosition(Math.round(x - PARALLAX_MARGIN + offset * layer.factor), Math.round(y));
