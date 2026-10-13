@@ -389,8 +389,8 @@ def write_markdown(entries, stats) -> None:
         elif cat == "tiles":
             add("| arquivo | dimensão | observação |")
             add("|---|---|---|")
-            add("| `sprites/Tiles/Floor Tiles1.png` | 288x576 | tileset 48x48, 3 variantes de topo (verde/laranja/neve) |")
-            add("| `sprites/Tiles/Floor Tiles2.png` | 288x576 | variante alternativa |")
+            add("| `sprites/Tiles/Floor Tiles1.png` | 288x576 | tileset **96x96** (3 col x 6 lin): linhas 0/2/4 = blocos sólidos com topo verde/laranja/neve; linhas 1/3/5 = peças de autotile (cruz, bordas, espinhos). Correção de auditoria de 2026-10-13: a grade anterior de 48x48 estava errada e fatiava bordas transparentes |")
+            add("| `sprites/Tiles/Floor Tiles2.png` | 288x576 | variante alternativa (mesma grade 96x96) |")
             add("| `sprites/Tiles/Tall Grass.png` | 96x32 | grama alta decorativa |")
         elif cat == "effects":
             add("70 arquivos: tiras de impacto/explosão (`* Bullet Impact Explosion "

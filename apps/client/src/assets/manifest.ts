@@ -37,7 +37,7 @@ export const SHEETS: SheetSpec[] = [
   { key: 'hero_attack', path: `${S}/Character/Attack-01/Attack-01-Sheet.png`, frameWidth: 96, frameHeight: 80, anims: { attack: { row: 0, frames: 8, fps: 12, loop: false } } },
   { key: 'hero_dead', path: `${S}/Character/Dead/Dead-Sheet.png`, frameWidth: 80, frameHeight: 64, anims: { death: { row: 0, frames: 8, fps: 8, loop: false } } },
   { key: 'fx_impact', path: `${S}/Effects/Red Effect Bullet Impact Explosion 32x32.png`, frameWidth: 32, frameHeight: 32, anims: {} },
-  { key: 'tiles_floor', path: `${S}/Tiles/Floor Tiles1.png`, frameWidth: 48, frameHeight: 48, anims: {} },
+  { key: 'tiles_floor', path: `${S}/Tiles/Floor Tiles1.png`, frameWidth: 96, frameHeight: 96, anims: {} },
   { key: 'boss_idle', path: `${S}/Boss/Chief Goblin/PNG/Spritesheets/Left - Idle.png`, frameWidth: 480, frameHeight: 480, anims: { idle: { row: 0, frames: 0, fps: 8, loop: true } } },
   { key: 'boss_walk', path: `${S}/Boss/Chief Goblin/PNG/Spritesheets/Left - Walking.png`, frameWidth: 480, frameHeight: 480, anims: { walk: { row: 0, frames: 0, fps: 8, loop: true } } },
   { key: 'boss_attack', path: `${S}/Boss/Chief Goblin/PNG/Spritesheets/Left - Attacking.png`, frameWidth: 480, frameHeight: 480, anims: { attack: { row: 0, frames: 0, fps: 10, loop: false } } },

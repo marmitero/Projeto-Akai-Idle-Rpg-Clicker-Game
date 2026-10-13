@@ -131,8 +131,8 @@ Robot1-3 e Troll1-3 possuem sequências PNG de dimensões irregulares (renderiza
 
 | arquivo | dimensão | observação |
 |---|---|---|
-| `sprites/Tiles/Floor Tiles1.png` | 288x576 | tileset 48x48, 3 variantes de topo (verde/laranja/neve) |
-| `sprites/Tiles/Floor Tiles2.png` | 288x576 | variante alternativa |
+| `sprites/Tiles/Floor Tiles1.png` | 288x576 | tileset **96x96** (3 col x 6 lin): linhas 0/2/4 = blocos sólidos com topo verde/laranja/neve; linhas 1/3/5 = peças de autotile (cruz, bordas, espinhos). Correção de auditoria de 2026-10-13: a grade anterior de 48x48 estava errada e fatiava bordas transparentes |
+| `sprites/Tiles/Floor Tiles2.png` | 288x576 | variante alternativa (mesma grade 96x96) |
 | `sprites/Tiles/Tall Grass.png` | 96x32 | grama alta decorativa |
 
 ### Fundos em camadas (`sprites/Backgrounds/`)

@@ -28,10 +28,20 @@ ficam fora do núcleo até decisão registrada.
 | bases compostas (80x64) | scale 1.5 | inimigos humanoides variados |
 | bosses (480/840) | scale 0.35-0.5 | destaque sem cobrir a tela |
 | ícones | 32 nativo, 20-28 dp em UI | nunca stretch não inteiro |
+| chão/teto | tiles 96x96 do `Floor Tiles1` com crop inteiro (40 px topo) | pitch 96 alinhado a inteiros; grade 48x48 era erro de auditoria (frestas) |
 
 ## 4. Fundos
 
-- Sempre em camadas 1→4 + castelo, com parallax 0.1/0.2/0.35/0.5/0.15.
+- Sempre em camadas 1→4 + castelo, com parallax 0.1/0.2/0.32/0.5/0.72.
+- Ancoragem verificada por mockup (`tools/out/previews/mock_combat3.png`):
+  o céu (layer 1) ancora o canvas 1024x346 inteiro ao chão; castelo e camadas
+  2-4 ancoram a linha de vegetação (y≈175 do canvas) logo acima do chão de
+  batalha. Ancorar todas as camadas pelo canvas inteiro deixa o cenário
+  "flutuando" com faixa vazia no meio da zona (defeito reportado e corrigido
+  em 2026-10-13).
+- Parallax de câmera: sway senoidal contínuo + deriva durante a caminhada
+  entre andares + offset determinístico por andar (margem 96 px, sem wrap
+  visível).
 - Bioma por faixa de andares: Normal 1-33, Autumn 34-66, Winter 67-99
   (configurável); boss mantém o bioma da faixa.
 - Fundo nunca recebe efeito de brilho/pulsar; quem pulsa é o combatente/efeito.
@@ -58,6 +68,15 @@ ficam fora do núcleo até decisão registrada.
   1 célula por golpe, vida ≤300 ms.
 - Buffs/debuffs: tiras `Character effects *` quando a grade for verificada
   (pendente); até lá, indicadores numéricos/ícones.
+
+## 7.1 Orientações (flip)
+
+- Herói (Character): olha à direita no asset → sem flip (fica à esquerda).
+- Esqueletos (sequências 128x96): olham à esquerda → sem flip (fica à direita).
+- Bases Male/Female compostas: olham à direita no asset → **flip X obrigatório**
+  quando usadas como inimigos à direita (correção do defeito "batendo de
+  costas", 2026-10-13).
+- Bosses (sheets `Left - *`): olham à esquerda → sem flip.
 
 ## 8. Composição de personagens (bases)
 

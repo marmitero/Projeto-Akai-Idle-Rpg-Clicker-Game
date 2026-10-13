@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import type { GameEvent, PlayerState } from '@akai/shared';
 import { COMPOSITIONS, IMAGES, SEQUENCES, SHEETS } from '../assets/manifest.js';
-import { CombatView, type Zone } from './CombatView.js';
+import { CombatView } from './CombatView.js';
+import type { Zone } from './zones.js';
 import { MiningView } from './MiningView.js';
 
 export const loadErrors: string[] = [];
@@ -85,6 +86,10 @@ export class MainScene extends Phaser.Scene {
     this.state = state;
     this.combat?.setState(state);
     this.mining?.setClickerLevel(state.clickerLevel);
+  }
+
+  override update(_time: number, delta: number): void {
+    this.combat?.update(Math.min(delta, 250));
   }
 
   playEvents(events: GameEvent[]): void {

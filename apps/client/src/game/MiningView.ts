@@ -1,34 +1,81 @@
 import Phaser from 'phaser';
 import { ironPerClick, type GameEvent } from '@akai/shared';
-import type { Zone } from './CombatView.js';
+import { buildCeiling, buildGround, GROUND_CROP_H } from './ground.js';
+import type { Zone } from './zones.js';
 
 /**
- * Área central: clicker de ferro (GDD §2). Piso de tileset real, nó de ferro
- * 16x16 ampliado, feedback imediato de impacto + número flutuante.
- * A recompensa em si vem do driver (local ou servidor), nunca daqui.
+ * Área central: o "caminho da mina" — uma cena PRÓPRIA e separada do combate
+ * (correção de 2026-10-13: antes era apenas um nó solto sobre uma faixa de
+ * tiles fatiada errada). Composição: caverna escura com teto de tileset
+ * espelhado, escoras de madeira, chão de tileset variante laranja (trilha
+ * própria), nó de ferro semi-enterrado no centro e veios decorativos de
+ * carvão/ouro/jade (assets reais, reservados como identidade das minas
+ * futuras — GDD §5).
  */
 export class MiningView {
   private node: Phaser.GameObjects.Image;
-  private ground: Phaser.GameObjects.TileSprite;
   private gainLabel: Phaser.GameObjects.Text;
   private onClick: (() => void) | null = null;
+  private groundTop: number;
 
   constructor(private readonly scene: Phaser.Scene, private readonly zone: Zone) {
-    scene.add.rectangle(zone.x + zone.w / 2, zone.y + zone.h / 2, zone.w, zone.h, 0x1a1410);
-    this.ground = scene.add.tileSprite(zone.x + zone.w / 2, zone.y + zone.h - 10, zone.w, 24, 'tiles_floor', 6);
-    this.node = scene.add.image(zone.x + zone.w / 2, zone.y + zone.h - 34, 'node_iron');
-    this.node.setScale(4);
+    const { x, y, w, h } = zone;
+    // fundo de caverna em dois tons (sem disputar atenção com o combate)
+    const top = scene.add.rectangle(x + w / 2, y + h * 0.35, w, h * 0.7, 0x140e08);
+    const bottom = scene.add.rectangle(x + w / 2, y + h * 0.85, w, h * 0.3, 0x1d1409);
+    top.setDepth(-5);
+    bottom.setDepth(-5);
+
+    // separador físico entre combate e mina: vigas + teto de caverna
+    const sep = scene.add.rectangle(x + w / 2, y + 2, w, 4, 0x000000, 0.85);
+    sep.setDepth(5);
+    buildCeiling(scene, x, y + 4, w, 6, 26).setDepth(1);
+
+    // escoras de madeira laterais
+    for (const px of [x + 10, x + w - 10]) {
+      const post = scene.add.rectangle(px, y + h / 2, 7, h - 24, 0x4a3520);
+      post.setDepth(1);
+    }
+
+    // trilha própria da mina (variante laranja do tileset)
+    this.groundTop = y + h - GROUND_CROP_H + 6;
+    buildGround(scene, x, y + h + 6, w, 6, GROUND_CROP_H, 0x2a1c10).container.setDepth(1);
+
+    // veios decorativos (identidade das minas futuras)
+    const veins: Array<[string, number, number]> = [
+      ['node_coal', 0.18, 2.2],
+      ['node_gold', 0.82, 2.2],
+      ['node_jade', 0.93, 1.8],
+    ];
+    for (const [key, fx, scale] of veins) {
+      const vein = scene.add.image(x + w * fx, this.groundTop + 6, key);
+      vein.setScale(scale);
+      vein.setAlpha(0.85);
+      vein.setDepth(2);
+    }
+
+    // nó de ferro clicável, semi-enterrado na trilha
+    this.node = scene.add.image(x + w / 2, this.groundTop + 2, 'node_iron');
+    this.node.setScale(5);
+    this.node.setDepth(3);
     this.node.setInteractive({ useHandCursor: true });
     this.node.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       this.fx(pointer.x, pointer.y);
       this.onClick?.();
     });
-    this.gainLabel = scene.add.text(zone.x + zone.w / 2, zone.y + 10, '', {
+
+    const title = scene.add.text(x + 8, y + 10, 'CAMINHO DA MINA', {
+      fontSize: '10px',
+      color: '#8d8aa0',
+      fontStyle: 'bold',
+    });
+    title.setDepth(6);
+    this.gainLabel = scene.add.text(x + w / 2, y + 26, '', {
       fontSize: '13px',
       color: '#e8e6da',
       fontStyle: 'bold',
     });
-    this.gainLabel.setOrigin(0.5, 0);
+    this.gainLabel.setOrigin(0.5, 0).setDepth(6);
   }
 
   setClickHandler(handler: () => void): void {
@@ -46,10 +93,10 @@ export class MiningView {
     this.scene.tweens.add({ targets: fx, scale: 2.2, alpha: 0, duration: 220, onComplete: () => fx.destroy() });
     this.scene.tweens.add({
       targets: this.node,
-      scaleY: 3.7,
+      scaleY: 4.6,
       duration: 60,
       yoyo: true,
-      onComplete: () => this.node.setScale(4),
+      onComplete: () => this.node.setScale(5),
     });
     for (let i = 0; i < 5; i += 1) {
       const p = this.scene.add.image(x, y, 'icon_iron');
@@ -69,7 +116,7 @@ export class MiningView {
   playEvents(events: GameEvent[]): void {
     for (const ev of events) {
       if (ev.t === 'click') {
-        const t = this.scene.add.text(this.node.x, this.node.y - 50, `+${ev.iron}`, {
+        const t = this.scene.add.text(this.node.x, this.node.y - 56, `+${ev.iron}`, {
           fontSize: '16px',
           color: '#cfd2d6',
           fontStyle: 'bold',
