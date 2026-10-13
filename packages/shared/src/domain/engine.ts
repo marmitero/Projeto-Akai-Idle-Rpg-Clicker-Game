@@ -25,6 +25,7 @@ export const createInitialState = (nowMs: number, floor = 1): PlayerState => ({
   },
   autoProgress: true,
   bossRetryAvailable: false,
+  combatSpeed: 1,
   battle: createBattle(floor, initialSeed()),
   fractional: {},
   createdAtMs: nowMs,
@@ -32,9 +33,13 @@ export const createInitialState = (nowMs: number, floor = 1): PlayerState => ({
   offlineReport: null,
 });
 
-/** Tick de mundo: batalha + minas. Usado pelo server (autoridade) e pelo modo local. */
+/**
+ * Tick de mundo: batalha + minas. Usado pelo server (autoridade) e pelo modo
+ * local. A velocidade de combate (1x/2x) escala SOMENTE o dt da batalha;
+ * minas e produção offline permanecem em tempo real (docs/BALANCE.md).
+ */
 export const tickWorld = (state: PlayerState, dtMs: number): GameEvent[] => {
-  const events = tickBattle(state, dtMs);
+  const events = tickBattle(state, dtMs * state.combatSpeed);
   events.push(...tickMines(state, dtMs));
   return events;
 };
@@ -45,7 +50,9 @@ export type Intent =
   | { t: 'unlockMine'; mineId: string }
   | { t: 'upgradeMine'; mineId: string }
   | { t: 'bossRetry' }
-  | { t: 'setAuto'; on: boolean };
+  | { t: 'setAuto'; on: boolean }
+  | { t: 'setSpeed'; mult: 1 | 2 }
+  | { t: 'ackOffline' };
 
 export const applyIntent = (state: PlayerState, intent: Intent): IntentResult => {
   let result: IntentResult;
@@ -65,6 +72,14 @@ export const applyIntent = (state: PlayerState, intent: Intent): IntentResult =>
     case 'bossRetry':
       if (!state.bossRetryAvailable) result = { events: [], error: 'NOT_AVAILABLE' };
       else result = { events: retryBoss(state) };
+      break;
+    case 'setSpeed':
+      state.combatSpeed = intent.mult;
+      result = { events: [] };
+      break;
+    case 'ackOffline':
+      state.offlineReport = null;
+      result = { events: [] };
       break;
     case 'setAuto':
       state.autoProgress = intent.on;

@@ -29,6 +29,9 @@
   motivo (requisito) visível; ícone do recurso no custo.
 - Progressão: botão de pausa/retomada sempre visível na área 1; após derrota de
   boss, banner "Tentar novamente" (ação explícita, master-prompt §9.3).
+- Velocidade: botão `1x/2x` na área 1 alterna `setSpeed` (somente batalha).
+- Reconexão com produção offline: banner de resumo (tempo fora + ganhos),
+  confirmado uma única vez por relatório (`ackOffline`).
 - Safe areas: `env(safe-area-inset-*)` no shell HTML; canvas respeita o container.
 - Sem menus cobrindo controles; abas da área 3 com altura mínima de toque 44 dp.
 

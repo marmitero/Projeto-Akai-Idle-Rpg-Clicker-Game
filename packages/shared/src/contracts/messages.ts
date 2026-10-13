@@ -49,6 +49,17 @@ export const SetAutoIntent = z.object({
   on: z.boolean(),
 });
 
+export const SetSpeedIntent = z.object({
+  ...base,
+  t: z.literal('setSpeed'),
+  mult: z.union([z.literal(1), z.literal(2)]),
+});
+
+export const AckOfflineIntent = z.object({
+  ...base,
+  t: z.literal('ackOffline'),
+});
+
 export const HelloMessage = z.object({
   ...base,
   t: z.literal('hello'),
@@ -63,6 +74,8 @@ export const ClientMessage = z.discriminatedUnion('t', [
   UpgradeMineIntent,
   BossRetryIntent,
   SetAutoIntent,
+  SetSpeedIntent,
+  AckOfflineIntent,
 ]);
 
 export type ClientMessage = z.infer<typeof ClientMessage>;

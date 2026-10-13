@@ -1,7 +1,7 @@
 # AI_STATE — Projeto Akai
 
 > Documento factual de continuidade. Atualizado em **2026-10-13** ao fim da
-> primeira execução (Fases 0-3). Nada aqui é marcado como concluído sem
+> segunda execução (Fases 0-3 + 3.5). Nada aqui é marcado como concluído sem
 > evidência (teste/build/execução) registrada nesta entrega.
 
 ## 1. Objetivo atual
@@ -12,8 +12,8 @@ e então iniciar a Fase 3.5/4 (qualidade de vida + equipamentos).
 
 ## 2. Fase atual
 
-**Fase 3 concluída** (loop principal jogável). Fase 4 não iniciada.
-Fases 0, 1 e 2 concluídas na mesma execução.
+**Fase 3.5 concluída** (loop principal + velocidade de combate + resumo
+offline). Fase 4 não iniciada. Fases 0-3 concluídas na primeira execução.
 
 ## 3. Estado real do repositório
 
@@ -65,13 +65,17 @@ Fases 0, 1 e 2 concluídas na mesma execução.
   cena de mineração com `ironNode.png` 16x16 (scale 4) e ícone `Icon31_15`;
   HUD com ícones reais; painel HTML de minas/melhorias com custos e estados;
   drivers online (WS) e local (localStorage) com fallback automático.
-- Testes: 43 passando (shared 32, server 7, assets 4) cobrindo a lista
+- Testes: 49 passando (shared 36, server 9, assets 4) cobrindo a lista
   obrigatória aplicável ao MVP (TEST_PLAN §2).
+- Fase 3.5: velocidade de combate 1x/2x (intent `setSpeed`, botão na área de
+  combate, escala só o tick de batalha — minas em tempo real, testado) e
+  resumo de produção offline em banner com `ackOffline` idempotente por
+  relatório; migração defensiva de saves locais anteriores.
 
 ## 7. Funcionalidades parciais / pendentes
 
-- Velocidade de combate 1x/2x e resumo offline na UI (Fase 3.5).
-- Curadoria de build de produção de assets (ADR-0004, Fase 3.5).
+- Curadoria de build de produção de assets (`tools/copy_curated_assets.ts`,
+  ADR-0004) — necessária antes de qualquer release.
 - Minas de ouro/jade: regras prontas no domínio/config, sem UI de teste
   dedicada além do painel (desbloqueio já funciona via painel).
 - Efeitos `Character effects *` e sheets 640x512/864x672 pendentes de grade.
@@ -89,17 +93,20 @@ Fases 0, 1 e 2 concluídas na mesma execução.
 
 ## 9. Últimos testes
 
-`npx vitest run` → 8 arquivos, 43 testes, 0 falhas (2026-10-13 15:53).
+`npx vitest run` → 9 arquivos, 49 testes, 0 falhas (2026-10-13 16:03).
 `tsc -b packages/shared apps/server apps/client` → 0 erros.
 `vite build` → ok. Smoke HTTP ponta a ponta → ok (sessão/clique/state/sprites).
 
 ## 10. Próxima tarefa concreta
 
-**Fase 3.5-A**: implementar velocidade de combate 1x/2x (intent `setSpeed`,
-multiplicador de dt no tick autoritativo, botão na UI) com testes; depois
-**Fase 3.5-B**: painel de resumo de produção offline ao reconectar; depois
-**Fase 4.1**: equipamentos com raridade e drop de boss (geração no domínio
-autoritativo, ícones reais de `sprites/Equipments/`).
+**Fase 4.1 — equipamentos com raridade e drop de boss**: definições
+configuráveis em `packages/shared/src/config/equipment.ts` (categorias reais
+dos ícones de `sprites/Equipments/`), geração SOMENTE no domínio autoritativo,
+roll de raridade por boss conforme DROP_TABLES §2, instâncias em
+`PlayerState.inventory`, UI de inventário/equipar na aba de melhorias, e testes
+estatísticos (100k rolls semeados, ±2 p.p.) + teste de não-duplicação de drop.
+Dependências: nenhuma bloqueante. Critério de aceite: drop de boss gera item
+persistido, equipável, com atributos aplicados ao combate.
 
 ## 11. Arquivos relevantes
 
@@ -112,9 +119,11 @@ autoritativo, ícones reais de `sprites/Equipments/`).
 
 ## 12. Alterações recentes (esta execução)
 
-Criação de toda a base de código, docs e testes listados nas seções 3 e 6;
-nenhum arquivo pré-existente foi removido, renomeado ou sobrescrito
-(`docs/master-prompt.md` e `sprites/` intactos).
+Primeira execução: criação de toda a base de código, docs e testes das seções
+3 e 6 (commit `14343d2`). Segunda execução: Fase 3.5 (setSpeed/ackOffline,
+botões de UI, migração de saves, docs atualizadas). Nenhum arquivo
+pré-existente foi removido, renomeado ou sobrescrito (`docs/master-prompt.md`
+e `sprites/` intactos).
 
 ## 13. Bloqueios
 

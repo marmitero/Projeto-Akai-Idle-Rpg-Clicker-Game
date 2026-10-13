@@ -24,12 +24,20 @@ const game = new Phaser.Game({
 let driver: Driver | null = null;
 let mainScene: MainScene | null = null;
 let lastState: PlayerState | null = null;
+let lastOfflineJson = '';
 
 const handlers: DriverHandlers = {
   onState: (state) => {
     lastState = state;
     shell.render(state);
     mainScene?.setState(state);
+    const report = state.offlineReport;
+    const json = report ? JSON.stringify(report) : '';
+    if (report && json !== lastOfflineJson) {
+      lastOfflineJson = json;
+      shell.showOfflineReport(report);
+    }
+    if (!report) lastOfflineJson = '';
   },
   onEvents: (events: GameEvent[]) => {
     mainScene?.playEvents(events);

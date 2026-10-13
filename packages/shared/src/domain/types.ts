@@ -58,6 +58,7 @@ export interface PlayerState {
   mines: Record<string, MineState>;
   autoProgress: boolean;
   bossRetryAvailable: boolean;
+  combatSpeed: 1 | 2;
   battle: BattleState;
   fractional: Record<string, number>;
   createdAtMs: number;

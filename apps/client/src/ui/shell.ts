@@ -29,6 +29,8 @@ export class Shell {
   private bossTimer: HTMLElement;
   private btnAuto: HTMLButtonElement;
   private btnRetry: HTMLButtonElement;
+  private btnSpeed: HTMLButtonElement;
+  private lastSpeed: 1 | 2 = 1;
   private banner: HTMLElement;
   private badge: HTMLButtonElement;
   private bannerTimeout = 0;
@@ -40,6 +42,7 @@ export class Shell {
     this.waveLabel = document.getElementById('wave-label')!;
     this.bossTimer = document.getElementById('boss-timer')!;
     this.btnAuto = document.getElementById('btn-auto') as HTMLButtonElement;
+    this.btnSpeed = document.getElementById('btn-speed') as HTMLButtonElement;
     this.btnRetry = document.getElementById('btn-retry') as HTMLButtonElement;
     this.banner = document.getElementById('banner')!;
     this.buildHud();
@@ -49,6 +52,9 @@ export class Shell {
       this.handlers.intent({ t: 'setAuto', on: !this.btnAuto.dataset.on || this.btnAuto.dataset.on === 'false' });
     });
     this.btnRetry.addEventListener('click', () => this.handlers.intent({ t: 'bossRetry' }));
+    this.btnSpeed.addEventListener('click', () => {
+      this.handlers.intent({ t: 'setSpeed', mult: this.lastSpeed === 1 ? 2 : 1 });
+    });
     this.badge = document.getElementById('mode-badge') as HTMLButtonElement;
     this.badge.addEventListener('click', () => this.handlers.toggleMode());
   }
@@ -104,6 +110,18 @@ export class Shell {
     if (note) this.showBanner(note);
   }
 
+  /** Resumo de produção offline (GDD §12); reconhece via intent ackOffline. */
+  showOfflineReport(report: { seconds: number; gains: Partial<Record<string, number>> }): void {
+    const hours = Math.floor(report.seconds / 3600);
+    const mins = Math.floor((report.seconds % 3600) / 60);
+    const tempo = hours > 0 ? `${hours}h${mins.toString().padStart(2, '0')}m` : `${mins}min`;
+    const nomes: Record<string, string> = { coal: 'carvão', gold: 'ouro', jade: 'jade', iron: 'ferro', coins: 'coins' };
+    const partes = Object.entries(report.gains).map(([k, v]) => `+${v} ${nomes[k] ?? k}`);
+    if (partes.length === 0) return;
+    this.showBanner(`Enquanto você esteve fora (${tempo}): ${partes.join(', ')}`);
+    this.handlers.intent({ t: 'ackOffline' });
+  }
+
   showBanner(text: string): void {
     this.banner.textContent = text;
     this.banner.style.display = 'block';
@@ -132,6 +150,8 @@ export class Shell {
     } else {
       this.bossTimer.style.display = 'none';
     }
+    this.lastSpeed = state.combatSpeed;
+    this.btnSpeed.textContent = `${state.combatSpeed}x`;
     this.btnAuto.textContent = `Auto: ${state.autoProgress ? 'ON' : 'OFF'}`;
     this.btnAuto.dataset.on = String(state.autoProgress);
     this.btnRetry.style.display = state.bossRetryAvailable ? 'block' : 'none';

@@ -30,6 +30,8 @@ Mensagens client→server (intenções; schemas zod em
 {v:1, t:"upgradeMine", actionId, mineId}
 {v:1, t:"bossRetry",   actionId}
 {v:1, t:"setAuto", on:boolean}
+{v:1, t:"setSpeed", mult:1|2}
+{v:1, t:"ackOffline"}
 ```
 
 Server→client:
@@ -45,6 +47,8 @@ Regras:
   tráfego por frame).
 - Eventos de batalha carregam apenas identificadores e valores calculados no
   servidor; o client os usa para animar, nunca para decidir.
+- `setSpeed` escala somente o tick de batalha (minas permanecem em tempo real).
+- `ackOffline` confirma o resumo de produção offline exibido ao reconectar.
 - Reconexão: `hello` reaplica estado completo; nenhuma ação é reprocessada
   (idempotência por `actionId`).
 

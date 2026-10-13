@@ -30,6 +30,8 @@ const intentFromMessage = (msg: ClientMessageType): Intent | null => {
     case 'upgradeMine': return { t: 'upgradeMine', mineId: msg.mineId };
     case 'bossRetry': return { t: 'bossRetry' };
     case 'setAuto': return { t: 'setAuto', on: msg.on };
+    case 'setSpeed': return { t: 'setSpeed', mult: msg.mult };
+    case 'ackOffline': return { t: 'ackOffline' };
     default: return null;
   }
 };

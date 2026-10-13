@@ -35,7 +35,11 @@ export class LocalDriver implements Driver {
       const raw = localStorage.getItem(SAVE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as PlayerState;
-        if (parsed.schemaVersion === 1 && parsed.resources && parsed.battle) loaded = parsed;
+        if (parsed.schemaVersion === 1 && parsed.resources && parsed.battle) {
+          // migração defensiva de saves anteriores à Fase 3.5
+          if (parsed.combatSpeed !== 1 && parsed.combatSpeed !== 2) parsed.combatSpeed = 1;
+          loaded = parsed;
+        }
       }
     } catch {
       loaded = null;

@@ -44,7 +44,8 @@ verdade executável).
 - Andares comuns **não têm limite de tempo**.
 - Derrota do herói em andar comum: recupera no mesmo andar com vida cheia,
   sem perder progresso de onda já concluída (auto-progressão continua).
-- Velocidade de combate configurável (1x/2x) — pendente Fase 3.5.
+- Velocidade de combate configurável (1x/2x): `[IMPLEMENTADO]` botão `1x/2x`
+  na área de combate; escala apenas o tick de batalha, nunca as minas.
 
 ### 3.1 Bosses de dezena `[IMPLEMENTADO]`
 
@@ -123,7 +124,8 @@ booleano do cliente como prova.
 ## 12. Retenção e experiência offline
 
 - Produção offline limitada (8 h, eficiência 60% no balanceamento provisório).
-- Retorno mostra resumo de ganhos offline (UI pendente Fase 3.5).
+- Retorno mostra resumo de ganhos offline em banner com duração e
+  recursos ganhos, confirmado por `ackOffline`. `[IMPLEMENTADO]`
 - Boss diário como âncora de horário fixo.
 
 ## 13. Critérios de vitória/derrota/desbloqueio

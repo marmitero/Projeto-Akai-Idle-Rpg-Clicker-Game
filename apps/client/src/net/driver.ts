@@ -6,7 +6,9 @@ export type UiIntent =
   | { t: 'unlockMine'; mineId: 'coal' | 'gold' | 'jade' }
   | { t: 'upgradeMine'; mineId: 'coal' | 'gold' | 'jade' }
   | { t: 'bossRetry' }
-  | { t: 'setAuto'; on: boolean };
+  | { t: 'setAuto'; on: boolean }
+  | { t: 'setSpeed'; mult: 1 | 2 }
+  | { t: 'ackOffline' };
 
 export interface DriverHandlers {
   onState: (state: PlayerState) => void;

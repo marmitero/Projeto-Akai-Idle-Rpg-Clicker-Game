@@ -117,3 +117,26 @@ describe('sessão e intenções HTTP', () => {
     expect(reloaded).not.toBeNull();
   });
 });
+
+describe('velocidade de combate via API', () => {
+  it('setSpeed 2 é aceito e persiste no estado', async () => {
+    const res = await built.app.inject({
+      method: 'POST',
+      url: '/api/intent',
+      headers: auth(),
+      payload: { v: 1, t: 'setSpeed', mult: 2 },
+    });
+    expect(res.statusCode).toBe(200);
+    expect((res.json() as { state: { combatSpeed: number } }).state.combatSpeed).toBe(2);
+  });
+
+  it('setSpeed com multiplicador fora de [1,2] é 400 VALIDATION', async () => {
+    const res = await built.app.inject({
+      method: 'POST',
+      url: '/api/intent',
+      headers: auth(),
+      payload: { v: 1, t: 'setSpeed', mult: 3 },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+});

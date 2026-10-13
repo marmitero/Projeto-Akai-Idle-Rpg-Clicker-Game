@@ -36,7 +36,7 @@ Legenda: ✅ concluído com evidência · 🟡 parcial · ⬜ pendente · ⛔ bl
 - [x] Feedback de clique (impacto + número flutuante + partícula).
 - [x] Redimensionamento sem distorção (scale adaptativo do canvas).
 
-## Fase 3 — Loop principal ✅ (MVP jogável)
+## Fase 3 — Loop principal ✅ (MVP jogável, incluindo 3.5)
 
 - [x] Combate automático com eventos determinísticos.
 - [x] 3 ondas × 3 inimigos por andar comum.
@@ -47,8 +47,8 @@ Legenda: ✅ concluído com evidência · 🟡 parcial · ⬜ pendente · ⛔ bl
 - [x] Mina de carvão (desbloqueio, produção/s, upgrade).
 - [x] Produção offline limitada por timestamps.
 - [x] Persistência local de teste + testes dos fluxos críticos.
-- [ ] Velocidade de combate 1x/2x (pendente 3.5).
-- [ ] Resumo de ganhos offline na UI (pendente 3.5).
+- [x] Velocidade de combate 1x/2x (intent `setSpeed`, testes de paridade).
+- [x] Resumo de ganhos offline na UI (banner + `ackOffline`).
 
 ## Fase 4 — Progressão RPG ⬜
 
@@ -94,6 +94,8 @@ auditoria de segurança, licenças confirmadas, monitoramento, rollback.
 
 ## Próxima tarefa concreta (após esta entrega)
 
-Fase 3.5 → **velocidade de combate 1x/2x + resumo offline na UI**, e em seguida
 Fase 4.1 → **equipamentos com raridade e drop de boss**, usando os ícones reais
-de `sprites/Equipments/` (geração no servidor/shared, nunca no client).
+de `sprites/Equipments/` (geração no domínio autoritativo, nunca no client),
+com testes estatísticos de drop (DROP_TABLES §4); em seguida Fase 4.2
+(mascotes, bloqueada por lacuna de asset) e `tools/copy_curated_assets.ts`
+(bundle curado de release, ADR-0004).

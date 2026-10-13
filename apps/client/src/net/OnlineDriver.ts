@@ -104,6 +104,12 @@ export class OnlineDriver implements Driver {
       case 'setAuto':
         ws.send(JSON.stringify({ v: CONTRACT_VERSION, t: 'setAuto', on: intent.on }));
         break;
+      case 'setSpeed':
+        ws.send(JSON.stringify({ v: CONTRACT_VERSION, t: 'setSpeed', mult: intent.mult }));
+        break;
+      case 'ackOffline':
+        ws.send(JSON.stringify({ v: CONTRACT_VERSION, t: 'ackOffline' }));
+        break;
     }
   }
 

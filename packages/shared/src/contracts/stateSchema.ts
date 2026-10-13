@@ -16,6 +16,7 @@ export const PlayerStateSchema = z.object({
   mines: z.record(z.object({ unlocked: z.boolean(), level: z.number().int().nonnegative() })),
   autoProgress: z.boolean(),
   bossRetryAvailable: z.boolean(),
+  combatSpeed: z.union([z.literal(1), z.literal(2)]),
   battle: z.object({
     floor: z.number().int().positive(),
     wave: z.number().int().nonnegative(),
